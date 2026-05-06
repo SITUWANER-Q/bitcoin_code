@@ -19,12 +19,19 @@ cd bitcoin_code
 
 
 ```bash
-bash setup.sh btc 3.10
+bash setup.sh btc 3.11
 
 conda activate btc
+pip install -e .
 bash scripts/download_all.sh
 python scripts/freeze_data.py
 python scripts/generate_configs.py
 python scripts/run_batch.py --smoke
 python scripts/run_batch.py main
 ```
+
+git add .
+git commit -m "update"
+git push
+
+git pull

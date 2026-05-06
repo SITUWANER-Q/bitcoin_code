@@ -75,10 +75,16 @@ def load_macro() -> pd.DataFrame:
 
 
 def _read_kaggle_csvs(folder: Path) -> pd.DataFrame:
+    """Load all CSV and Parquet files under folder (recursive). Used for Twitter/Reddit/news raw drops."""
     frames = []
-    for csv_path in folder.glob("**/*.csv"):
+    for csv_path in sorted(folder.glob("**/*.csv")):
         try:
             frames.append(pd.read_csv(csv_path, encoding="utf-8", low_memory=False))
+        except Exception:
+            continue
+    for pq_path in sorted(folder.glob("**/*.parquet")):
+        try:
+            frames.append(pd.read_parquet(pq_path))
         except Exception:
             continue
     if not frames:
