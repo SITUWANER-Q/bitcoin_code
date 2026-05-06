@@ -19,11 +19,18 @@ def iter_days(start: str, end: str):
 
 
 def download_gdelt(start: str, end: str, keywords: str) -> list[Path]:
+    """Download GDELT daily article lists. Existing non-empty json files are kept (per-day resume)."""
     out_dir = RAW_DIR / "news" / "gdelt"
     out_dir.mkdir(parents=True, exist_ok=True)
     saved: list[Path] = []
+    skipped = 0
     for dt in iter_days(start, end):
         day = dt.strftime("%Y%m%d")
+        out_path = out_dir / f"{day}.json"
+        if out_path.exists() and out_path.stat().st_size > 0:
+            saved.append(out_path)
+            skipped += 1
+            continue
         query = quote_plus(keywords)
         url = (
             "https://api.gdeltproject.org/api/v2/doc/doc"
@@ -32,9 +39,10 @@ def download_gdelt(start: str, end: str, keywords: str) -> list[Path]:
         resp = requests.get(url, timeout=60)
         if resp.status_code != 200:
             continue
-        out_path = out_dir / f"{day}.json"
         out_path.write_text(resp.text, encoding="utf-8")
         saved.append(out_path)
+    if skipped:
+        print(f"[download_gdelt] kept {skipped} existing json files")
     return saved
 
 
