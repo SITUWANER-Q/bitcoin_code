@@ -1,0 +1,24 @@
+flowchart LR
+    NumInput["NumericalStream (OHLCV + Tech + OnChain + Macro)"] --> NumEncoder["NumericEncoder (LSTM)"]
+    TxtInput["TextStream (Score + Embedding)"] --> TxtProj["TextProjection"]
+
+    NumEncoder --> NtoT["CrossAttn NumToText"]
+    TxtProj --> NtoT
+
+    TxtProj --> TtoN["CrossAttn TextToNum"]
+    NumEncoder --> TtoN
+
+    NumInput --> RegimeFeat["RegimeFeatures (RV20, ATR, MA200Slope, MACDAbs)"]
+    RegimeFeat --> RegimeGate["RegimeGate (FP32 Stabilizer)"]
+    RegimeGate --> Alpha["Alpha_t"]
+
+    NtoT --> Blend["RegimeAwareBlend"]
+    TtoN --> Blend
+    Alpha --> Blend
+    NumEncoder --> Residual["Residual NumPath"]
+    Residual --> Blend
+
+    Blend --> Pool["TemporalPool"]
+    Pool --> HeadReg["RegressionHead"]
+    Pool --> HeadCls["ClassificationHead"]
+    Pool --> HeadVol["VolatilityHead"]
