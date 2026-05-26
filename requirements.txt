@@ -13,7 +13,7 @@ transformers==4.41.2
 sentence-transformers==2.7.0
 huggingface_hub==0.23.4
 captum==0.7.0
-dieboldmariano==1.0.6
+dieboldmariano==1.1.0
 matplotlib==3.8.4
 seaborn==0.13.2
 tqdm==4.66.4
